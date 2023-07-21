@@ -3,8 +3,8 @@ import ConversationClient from "./components/client";
 import ImageGenerationClient from "./components/client";
 
 export const metadata: Metadata = {
-  title: "Conversations - Genius"
-}
+  title: "Image Generation - Genius",
+};
 
 export default function ImageGeneration() {
   return (

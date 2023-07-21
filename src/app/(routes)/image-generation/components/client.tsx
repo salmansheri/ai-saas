@@ -2,7 +2,6 @@
 
 import EmptyState from "@/components/empty-state";
 import Heading from "@/components/heading";
-import BotAvatar from "@/components/ui/bot-avatar";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,29 +13,38 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/ui/loading";
-import { toast } from "@/components/ui/use-toast";
-import { UserAvatar } from "@/components/ui/user-avatar";
-import { cn } from "@/lib/utils";
 import {
-  ConversationFormSchema,
-  ConversationFormType,
-} from "@/lib/validators/conversation-schema";
-import { ImageGenerationSchema, ImageGenerationType } from "@/lib/validators/image-generation-schema";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
+import { amountOptions, resolutionOptions } from "@/constants";
+import {
+  ImageGenerationSchema,
+  ImageGenerationType,
+} from "@/lib/validators/image-generation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { ImageIcon, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ChatCompletionRequestMessage } from "openai";
+
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import ImagesCard from "./images-card";
 
 const ImageGenerationClient = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [images, setImages] = useState<string[]>([]);
+
   const form = useForm<ImageGenerationType>({
     resolver: zodResolver(ImageGenerationSchema),
     defaultValues: {
       prompt: "",
+      amount: "1",
+      resolution: "512x512",
     },
   });
 
@@ -44,22 +52,20 @@ const ImageGenerationClient = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit: SubmitHandler<ImageGenerationType> = async (
-    data: ImageGenerationType
+    data: ImageGenerationType,
   ) => {
     try {
       setIsLoading(true);
-      const userMessages: ChatCompletionRequestMessage = {
-        role: "user",
-        content: data.prompt,
-      };
+      setImages([]);
 
-      const newMessages = [...messages, userMessages];
+      const response = await axios.post("/api/image-generation", data);
 
-      const response = await axios.post("/api/image-generation", {
-        messages: newMessages,
-      });
+      const imageUrls = response.data.map(
+        (image: { url: string }) => image.url,
+      );
 
-      setMessages((current) => [...current, userMessages, response.data]);
+      setImages(imageUrls);
+
       form.reset();
     } catch (error) {
       return toast({
@@ -93,7 +99,7 @@ const ImageGenerationClient = () => {
                   control={form.control}
                   name="prompt"
                   render={({ field }) => (
-                    <FormItem className="col-span-12 lg:col-span-10">
+                    <FormItem className="col-span-12 lg:col-span-6">
                       <FormControl>
                         <Input
                           className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
@@ -105,6 +111,60 @@ const ImageGenerationClient = () => {
                       </FormControl>
                       <FormDescription>Enter Your Prompt Here</FormDescription>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem className="col-span-12 lg:col-span-2">
+                      <Select
+                        disabled={isLoading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue defaultValue={field.value} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {amountOptions.map((option) => (
+                            <SelectItem key={option.label} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="resolution"
+                  render={({ field }) => (
+                    <FormItem className="col-span-12 lg:col-span-2">
+                      <Select
+                        disabled={isLoading}
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue defaultValue={field.value} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {resolutionOptions.map((option) => (
+                            <SelectItem key={option.label} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormItem>
                   )}
                 />
@@ -127,23 +187,12 @@ const ImageGenerationClient = () => {
           </div>
           <div className="space-y-4 mt-4">
             {isLoading && <Loading />}
-            {messages.length === 0 && !isLoading && (
-              <EmptyState label="No Conversations Started" />
+            {images.length === 0 && !isLoading && (
+              <EmptyState label="No Images Generated" />
             )}
-            <div className="flex flex-col-reverse gap-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.content}
-                  className={cn(
-                    "p-8 w-full flex items-start gap-x-8 rounded-lg",
-                    message.role === "user"
-                      ? "flex-row-reverse bg-white border border-black/10 "
-                      : "bg-muted flex-row"
-                  )}
-                >
-                  {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                  {message.content}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
+              {images.map((src) => (
+                <ImagesCard key={src} src={src} />
               ))}
             </div>
           </div>

@@ -23,16 +23,15 @@ import {
 } from "@/lib/validators/conversation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Code, Loader2, MessageSquare } from "lucide-react";
+import { Loader2, MessageSquare, Music } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import ReactMarkdown from "react-markdown";
 
-const CodeGenerationClient = () => {
+const MusicGenerationClient = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [music, setMusic] = useState<string>("");
   const form = useForm<ConversationFormType>({
     resolver: zodResolver(ConversationFormSchema),
     defaultValues: {
@@ -48,22 +47,16 @@ const CodeGenerationClient = () => {
   ) => {
     try {
       setIsLoading(true);
-      const userMessages: ChatCompletionRequestMessage = {
-        role: "user",
-        content: data.prompt,
-      };
+      setMusic("");
 
-      const newMessages = [...messages, userMessages];
+      const response = await axios.post("/api/music-generation", data);
 
-      const response = await axios.post("/api/code-generation", {
-        messages: newMessages,
-      });
+      setMusic(response.data.audio);
 
-      setMessages((current) => [...current, userMessages, response.data]);
       form.reset();
     } catch (error) {
       return toast({
-        title: "some",
+        title: "something went wrong",
         variant: "destructive",
       });
     } finally {
@@ -76,11 +69,11 @@ const CodeGenerationClient = () => {
     <>
       <div>
         <Heading
-          title="Code Generation"
-          description="Most advance AI Code Generation"
-          icon={Code}
-          iconColor="text-green-700"
-          bgColor="text-green-700/10"
+          title="Music Generation"
+          description="Most advance AI Music Generation"
+          icon={Music}
+          iconColor="text-emerald-500"
+          bgColor="text-emerald-500/10"
         />
         <div className="px-4 lg:px-8">
           <div>
@@ -99,7 +92,7 @@ const CodeGenerationClient = () => {
                           className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                           placeholder="Enter Prompt"
                           {...field}
-                          disabled={isLoading}
+                          // disabled={isLoading}
                           autoFocus
                         />
                       </FormControl>
@@ -127,42 +120,14 @@ const CodeGenerationClient = () => {
           </div>
           <div className="space-y-4 mt-4">
             {isLoading && <Loading />}
-            {messages.length === 0 && !isLoading && (
-              <EmptyState label="No Code Generation Started" />
+            {!music && !isLoading && (
+              <EmptyState label="No Conversations Started" />
             )}
-            <div className="flex flex-col-reverse gap-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.content}
-                  className={cn(
-                    "p-8 w-full flex items-start gap-x-8 rounded-lg",
-                    message.role === "user"
-                      ? "flex-row-reverse bg-white border border-black/10 "
-                      : "bg-muted flex-row",
-                  )}
-                >
-                  {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                  <ReactMarkdown
-                    components={{
-                      pre: ({ node, ...props }) => (
-                        <div className="overflow-auto w-full my-2 bg-black/10 p-2 rounded-lg backdrop-filter bg-clip-padding backdrop-blur-sm">
-                          <pre {...props} />
-                        </div>
-                      ),
-                      code: ({ node, ...props }) => (
-                        <code
-                          className="bg-black/10 rounded-lg p-1"
-                          {...props}
-                        />
-                      ),
-                    }}
-                    className="text-sm overflow-hidden leading-7"
-                  >
-                    {message.content || ""}
-                  </ReactMarkdown>
-                </div>
-              ))}
-            </div>
+            {music && (
+              <audio controls className="w-full mt-8">
+                <source src={music} />
+              </audio>
+            )}
           </div>
         </div>
       </div>
@@ -170,4 +135,4 @@ const CodeGenerationClient = () => {
   );
 };
 
-export default CodeGenerationClient;
+export default MusicGenerationClient;

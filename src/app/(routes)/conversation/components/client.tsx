@@ -43,7 +43,7 @@ const ConversationClient = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit: SubmitHandler<ConversationFormType> = async (
-    data: ConversationFormType
+    data: ConversationFormType,
   ) => {
     try {
       setIsLoading(true);
@@ -137,7 +137,7 @@ const ConversationClient = () => {
                     "p-8 w-full flex items-start gap-x-8 rounded-lg",
                     message.role === "user"
                       ? "flex-row-reverse bg-white border border-black/10 "
-                      : "bg-muted flex-row"
+                      : "bg-muted flex-row",
                   )}
                 >
                   {message.role === "user" ? <UserAvatar /> : <BotAvatar />}

@@ -2,7 +2,6 @@
 
 import EmptyState from "@/components/empty-state";
 import Heading from "@/components/heading";
-import BotAvatar from "@/components/ui/bot-avatar";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,24 +14,20 @@ import {
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/ui/loading";
 import { toast } from "@/components/ui/use-toast";
-import { UserAvatar } from "@/components/ui/user-avatar";
-import { cn } from "@/lib/utils";
 import {
   ConversationFormSchema,
   ConversationFormType,
 } from "@/lib/validators/conversation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Code, Loader2, MessageSquare } from "lucide-react";
+import { Loader2, VideoIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import ReactMarkdown from "react-markdown";
 
-const CodeGenerationClient = () => {
+const VideoGenerationClient = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [video, setVideo] = useState("");
   const form = useForm<ConversationFormType>({
     resolver: zodResolver(ConversationFormSchema),
     defaultValues: {
@@ -48,22 +43,16 @@ const CodeGenerationClient = () => {
   ) => {
     try {
       setIsLoading(true);
-      const userMessages: ChatCompletionRequestMessage = {
-        role: "user",
-        content: data.prompt,
-      };
+      setVideo("");
 
-      const newMessages = [...messages, userMessages];
+      const response = await axios.post("/api/video-generation", data);
 
-      const response = await axios.post("/api/code-generation", {
-        messages: newMessages,
-      });
+      setVideo(response.data[0]);
 
-      setMessages((current) => [...current, userMessages, response.data]);
       form.reset();
     } catch (error) {
       return toast({
-        title: "some",
+        title: "something went wrong",
         variant: "destructive",
       });
     } finally {
@@ -76,11 +65,11 @@ const CodeGenerationClient = () => {
     <>
       <div>
         <Heading
-          title="Code Generation"
-          description="Most advance AI Code Generation"
-          icon={Code}
-          iconColor="text-green-700"
-          bgColor="text-green-700/10"
+          title="Video Generation"
+          description="Most advance AI Video Generation"
+          icon={VideoIcon}
+          iconColor="text-orange-700"
+          bgColor="text-orange-700/10"
         />
         <div className="px-4 lg:px-8">
           <div>
@@ -99,7 +88,7 @@ const CodeGenerationClient = () => {
                           className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                           placeholder="Enter Prompt"
                           {...field}
-                          disabled={isLoading}
+                          // disabled={isLoading}
                           autoFocus
                         />
                       </FormControl>
@@ -127,42 +116,15 @@ const CodeGenerationClient = () => {
           </div>
           <div className="space-y-4 mt-4">
             {isLoading && <Loading />}
-            {messages.length === 0 && !isLoading && (
-              <EmptyState label="No Code Generation Started" />
+            {!video && !isLoading && <EmptyState label="No Video Started" />}
+            {video && (
+              <video
+                controls
+                className="w-full aspect-video mt-8 rounded-lg border bg-black"
+              >
+                <source src={video} />
+              </video>
             )}
-            <div className="flex flex-col-reverse gap-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.content}
-                  className={cn(
-                    "p-8 w-full flex items-start gap-x-8 rounded-lg",
-                    message.role === "user"
-                      ? "flex-row-reverse bg-white border border-black/10 "
-                      : "bg-muted flex-row",
-                  )}
-                >
-                  {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                  <ReactMarkdown
-                    components={{
-                      pre: ({ node, ...props }) => (
-                        <div className="overflow-auto w-full my-2 bg-black/10 p-2 rounded-lg backdrop-filter bg-clip-padding backdrop-blur-sm">
-                          <pre {...props} />
-                        </div>
-                      ),
-                      code: ({ node, ...props }) => (
-                        <code
-                          className="bg-black/10 rounded-lg p-1"
-                          {...props}
-                        />
-                      ),
-                    }}
-                    className="text-sm overflow-hidden leading-7"
-                  >
-                    {message.content || ""}
-                  </ReactMarkdown>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -170,4 +132,4 @@ const CodeGenerationClient = () => {
   );
 };
 
-export default CodeGenerationClient;
+export default VideoGenerationClient;

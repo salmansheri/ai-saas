@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const { userId } = auth();
     const body = await request.json();
-    const { messages } = body;
+    const { prompt, amount = 1, resolution = "512x512" } = body;
 
     if (!userId) {
       return new Response("Unauthenticated", {
@@ -26,20 +26,31 @@ export async function POST(request: Request) {
       });
     }
 
-    if (!messages) {
-      return new Response("Messages are Required", {
+    if (!prompt) {
+      return new Response("Prompt are Required", {
+        status: 400,
+      });
+    }
+    if (!amount) {
+      return new Response("Amount are Required", {
+        status: 400,
+      });
+    }
+    if (!resolution) {
+      return new Response("Resolution are Required", {
         status: 400,
       });
     }
 
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: messages,
+    const response = await openai.createImage({
+      prompt,
+      n: parseInt(amount, 10),
+      size: resolution,
     });
 
-    return NextResponse.json(response.data.choices[0].message);
+    return NextResponse.json(response.data.data);
   } catch (error) {
-    console.log(error);
+    console.log("[IMAGE_ERROR]", error);
     return new Response("Internal Server Error", {
       status: 500,
     });
