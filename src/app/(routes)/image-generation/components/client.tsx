@@ -21,19 +21,20 @@ import {
   ConversationFormSchema,
   ConversationFormType,
 } from "@/lib/validators/conversation-schema";
+import { ImageGenerationSchema, ImageGenerationType } from "@/lib/validators/image-generation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Loader2, MessageSquare } from "lucide-react";
+import { ImageIcon, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-const ConversationClient = () => {
+const ImageGenerationClient = () => {
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
-  const form = useForm<ConversationFormType>({
-    resolver: zodResolver(ConversationFormSchema),
+  const form = useForm<ImageGenerationType>({
+    resolver: zodResolver(ImageGenerationSchema),
     defaultValues: {
       prompt: "",
     },
@@ -42,8 +43,8 @@ const ConversationClient = () => {
   let prompt = form.watch("prompt");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const onSubmit: SubmitHandler<ConversationFormType> = async (
-    data: ConversationFormType
+  const onSubmit: SubmitHandler<ImageGenerationType> = async (
+    data: ImageGenerationType
   ) => {
     try {
       setIsLoading(true);
@@ -54,7 +55,7 @@ const ConversationClient = () => {
 
       const newMessages = [...messages, userMessages];
 
-      const response = await axios.post("/api/conversations", {
+      const response = await axios.post("/api/image-generation", {
         messages: newMessages,
       });
 
@@ -75,11 +76,11 @@ const ConversationClient = () => {
     <>
       <div>
         <Heading
-          title="Conversations"
-          description="Most advance"
-          icon={MessageSquare}
-          iconColor="text-violet-500"
-          bgColor="text-violet-500/10"
+          title="Image Generation"
+          description="Most advance AI Image Generation"
+          icon={ImageIcon}
+          iconColor="text-pink-700"
+          bgColor="text-pink-700/10"
         />
         <div className="px-4 lg:px-8">
           <div>
@@ -98,7 +99,7 @@ const ConversationClient = () => {
                           className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                           placeholder="Enter Prompt"
                           {...field}
-                          // disabled={isLoading}
+                          disabled={isLoading}
                           autoFocus
                         />
                       </FormControl>
@@ -152,4 +153,4 @@ const ConversationClient = () => {
   );
 };
 
-export default ConversationClient;
+export default ImageGenerationClient;

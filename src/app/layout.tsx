@@ -23,8 +23,8 @@ export default function RootLayout({
         <body className={inter.className}>
           <QueryProvider>
             {children}
-            <Toaster />
           </QueryProvider>
+            <Toaster />
         </body>
       </html>
     </ClerkProvider>

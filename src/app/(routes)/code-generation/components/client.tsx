@@ -23,13 +23,14 @@ import {
 } from "@/lib/validators/conversation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { Loader2, MessageSquare } from "lucide-react";
+import { Code, Loader2, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChatCompletionRequestMessage } from "openai";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import ReactMarkdown from "react-markdown";
 
-const ConversationClient = () => {
+const CodeGenerationClient = () => {
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
   const form = useForm<ConversationFormType>({
@@ -54,7 +55,7 @@ const ConversationClient = () => {
 
       const newMessages = [...messages, userMessages];
 
-      const response = await axios.post("/api/conversations", {
+      const response = await axios.post("/api/code-generation", {
         messages: newMessages,
       });
 
@@ -75,11 +76,11 @@ const ConversationClient = () => {
     <>
       <div>
         <Heading
-          title="Conversations"
-          description="Most advance"
-          icon={MessageSquare}
-          iconColor="text-violet-500"
-          bgColor="text-violet-500/10"
+          title="Code Generation"
+          description="Most advance AI Code Generation"
+          icon={Code}
+          iconColor="text-green-700"
+          bgColor="text-green-700/10"
         />
         <div className="px-4 lg:px-8">
           <div>
@@ -98,7 +99,7 @@ const ConversationClient = () => {
                           className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                           placeholder="Enter Prompt"
                           {...field}
-                          // disabled={isLoading}
+                          disabled={isLoading}
                           autoFocus
                         />
                       </FormControl>
@@ -127,7 +128,7 @@ const ConversationClient = () => {
           <div className="space-y-4 mt-4">
             {isLoading && <Loading />}
             {messages.length === 0 && !isLoading && (
-              <EmptyState label="No Conversations Started" />
+              <EmptyState label="No Code Generation Started" />
             )}
             <div className="flex flex-col-reverse gap-y-4">
               {messages.map((message) => (
@@ -141,7 +142,24 @@ const ConversationClient = () => {
                   )}
                 >
                   {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                  {message.content}
+                  <ReactMarkdown
+                    components={{
+                      pre: ({ node, ...props }) => (
+                        <div className="overflow-auto w-full my-2 bg-black/10 p-2 rounded-lg backdrop-filter bg-clip-padding backdrop-blur-sm">
+                          <pre {...props} />
+                        </div>
+                      ),
+                      code: ({ node, ...props }) => (
+                        <code
+                          className="bg-black/10 rounded-lg p-1"
+                          {...props}
+                        />
+                      ),
+                    }}
+                    className="text-sm overflow-hidden leading-7"
+                  >
+                    {message.content || ""}
+                  </ReactMarkdown>
                 </div>
               ))}
             </div>
@@ -152,4 +170,4 @@ const ConversationClient = () => {
   );
 };
 
-export default ConversationClient;
+export default CodeGenerationClient;
