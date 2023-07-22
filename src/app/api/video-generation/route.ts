@@ -1,3 +1,4 @@
+import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
@@ -24,14 +25,24 @@ export async function POST(request: Request) {
       });
     }
 
+    const freeLimit = await checkApiLimit();
+
+    if (!freeLimit) {
+      return new Response("Free Limit is Exceeded", {
+        status: 403,
+      });
+    }
+
     const response = await replication.run(
       "anotherjesse/zeroscope-v2-xl:9f747673945c62801b13b84701c783929c0ee784e4748ec062204894dda1a351",
       {
         input: {
           prompt: prompt,
         },
-      },
+      }
     );
+
+    await increaseApiLimit();
 
     return NextResponse.json(response);
   } catch (error) {
