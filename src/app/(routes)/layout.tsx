@@ -7,7 +7,7 @@ export default async function RouteLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const apiLimitCount = await getApiLimitCount(); 
+  const apiLimitCount = await getApiLimitCount();
 
   return (
     <div className="h-full relative">

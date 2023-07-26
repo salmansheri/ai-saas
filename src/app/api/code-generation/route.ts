@@ -39,12 +39,12 @@ export async function POST(request: Request) {
       });
     }
 
-    const freeTrial = await checkApiLimit(); 
+    const freeTrial = await checkApiLimit();
 
-    if(!freeTrial) {
+    if (!freeTrial) {
       return new Response("Free trial has been expired", {
-        status: 403
-      })
+        status: 403,
+      });
     }
 
     const response = await openai.createChatCompletion({

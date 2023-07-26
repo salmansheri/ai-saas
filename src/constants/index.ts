@@ -145,5 +145,4 @@ export const resolutionOptions = [
   },
 ];
 
-export const MAX_FREE_COUNTS = 5; 
-
+export const MAX_FREE_COUNTS = 5;

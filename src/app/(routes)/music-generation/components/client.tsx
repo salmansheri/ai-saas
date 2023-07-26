@@ -32,7 +32,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const MusicGenerationClient = () => {
-  const proModal = useProModal(); 
+  const proModal = useProModal();
   const router = useRouter();
   const [music, setMusic] = useState<string>("");
   const form = useForm<ConversationFormType>({
@@ -58,8 +58,8 @@ const MusicGenerationClient = () => {
 
       form.reset();
     } catch (error) {
-      if(error instanceof AxiosError) {
-        return proModal.onOpen(); 
+      if (error instanceof AxiosError) {
+        return proModal.onOpen();
       }
       return toast({
         title: "something went wrong",

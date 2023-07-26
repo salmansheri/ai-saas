@@ -39,7 +39,7 @@ export async function POST(request: Request) {
         input: {
           prompt: prompt,
         },
-      }
+      },
     );
 
     await increaseApiLimit();
