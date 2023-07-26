@@ -14,18 +14,20 @@ import {
 import { Input } from "@/components/ui/input";
 import Loading from "@/components/ui/loading";
 import { toast } from "@/components/ui/use-toast";
+import useProModal from "@/hooks/use-pro-modal";
 import {
   ConversationFormSchema,
   ConversationFormType,
 } from "@/lib/validators/conversation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Loader2, VideoIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const VideoGenerationClient = () => {
+  const proModal = useProModal(); 
   const router = useRouter();
   const [video, setVideo] = useState("");
   const form = useForm<ConversationFormType>({
@@ -51,6 +53,9 @@ const VideoGenerationClient = () => {
 
       form.reset();
     } catch (error) {
+      if(error instanceof AxiosError) {
+        return proModal.onOpen(); 
+      }
       return toast({
         title: "something went wrong",
         variant: "destructive",

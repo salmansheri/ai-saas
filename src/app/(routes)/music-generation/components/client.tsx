@@ -16,13 +16,15 @@ import { Input } from "@/components/ui/input";
 import Loading from "@/components/ui/loading";
 import { toast } from "@/components/ui/use-toast";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import useProModal from "@/hooks/use-pro-modal";
 import { cn } from "@/lib/utils";
 import {
   ConversationFormSchema,
   ConversationFormType,
 } from "@/lib/validators/conversation-schema";
+import { initialState } from "@clerk/nextjs/dist/types/app-router/server/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Loader2, MessageSquare, Music } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChatCompletionRequestMessage } from "openai";
@@ -30,6 +32,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const MusicGenerationClient = () => {
+  const proModal = useProModal(); 
   const router = useRouter();
   const [music, setMusic] = useState<string>("");
   const form = useForm<ConversationFormType>({
@@ -55,6 +58,9 @@ const MusicGenerationClient = () => {
 
       form.reset();
     } catch (error) {
+      if(error instanceof AxiosError) {
+        return proModal.onOpen(); 
+      }
       return toast({
         title: "something went wrong",
         variant: "destructive",

@@ -27,15 +27,17 @@ import {
   ImageGenerationType,
 } from "@/lib/validators/image-generation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { ImageIcon, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import ImagesCard from "./images-card";
+import useProModal from "@/hooks/use-pro-modal";
 
 const ImageGenerationClient = () => {
+  const proModal = useProModal(); 
   const router = useRouter();
   const [images, setImages] = useState<string[]>([]);
 
@@ -68,8 +70,13 @@ const ImageGenerationClient = () => {
 
       form.reset();
     } catch (error) {
+      if(error instanceof AxiosError) {
+        if(error?.response?.status === 403) {
+          return proModal.onOpen(); 
+        }
+      }
       return toast({
-        title: "some",
+        title: "something went wrong",
         variant: "destructive",
       });
     } finally {

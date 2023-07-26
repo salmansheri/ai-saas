@@ -16,13 +16,14 @@ import { Input } from "@/components/ui/input";
 import Loading from "@/components/ui/loading";
 import { toast } from "@/components/ui/use-toast";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import useProModal from "@/hooks/use-pro-modal";
 import { cn } from "@/lib/utils";
 import {
   ConversationFormSchema,
   ConversationFormType,
 } from "@/lib/validators/conversation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Loader2, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChatCompletionRequestMessage } from "openai";
@@ -30,6 +31,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const ConversationClient = () => {
+  const proModal = useProModal();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
   const form = useForm<ConversationFormType>({
@@ -43,7 +45,7 @@ const ConversationClient = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit: SubmitHandler<ConversationFormType> = async (
-    data: ConversationFormType,
+    data: ConversationFormType
   ) => {
     try {
       setIsLoading(true);
@@ -60,9 +62,12 @@ const ConversationClient = () => {
 
       setMessages((current) => [...current, userMessages, response.data]);
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) {
+       return  proModal.onOpen(); // if error status is 403 it will open pro Modal dialog
+      }
       return toast({
-        title: "some",
+        title: "something went wrong",
         variant: "destructive",
       });
     } finally {
@@ -137,7 +142,7 @@ const ConversationClient = () => {
                     "p-8 w-full flex items-start gap-x-8 rounded-lg",
                     message.role === "user"
                       ? "flex-row-reverse bg-white border border-black/10 "
-                      : "bg-muted flex-row",
+                      : "bg-muted flex-row"
                   )}
                 >
                   {message.role === "user" ? <UserAvatar /> : <BotAvatar />}

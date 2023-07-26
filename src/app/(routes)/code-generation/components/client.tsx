@@ -16,13 +16,14 @@ import { Input } from "@/components/ui/input";
 import Loading from "@/components/ui/loading";
 import { toast } from "@/components/ui/use-toast";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import useProModal from "@/hooks/use-pro-modal";
 import { cn } from "@/lib/utils";
 import {
   ConversationFormSchema,
   ConversationFormType,
 } from "@/lib/validators/conversation-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Code, Loader2, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ChatCompletionRequestMessage } from "openai";
@@ -31,6 +32,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
 
 const CodeGenerationClient = () => {
+  const proModal = useProModal(); 
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
   const form = useForm<ConversationFormType>({
@@ -62,6 +64,9 @@ const CodeGenerationClient = () => {
       setMessages((current) => [...current, userMessages, response.data]);
       form.reset();
     } catch (error) {
+      if(error instanceof AxiosError) {
+        return proModal.onOpen(); 
+      }
       return toast({
         title: "some",
         variant: "destructive",

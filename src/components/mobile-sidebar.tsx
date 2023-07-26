@@ -7,7 +7,10 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import Sidebar from "./sidebar";
 import { UseMounted } from "@/hooks/use-mounted";
 
-const MobileSidebar = () => {
+interface MobileSidebarProps {
+  apiLimitCount: number;
+}
+const MobileSidebar: React.FC<MobileSidebarProps> = ({ apiLimitCount }) => {
   const { isMounted } = UseMounted();
 
   if (!isMounted) {
@@ -21,7 +24,7 @@ const MobileSidebar = () => {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="p-0">
-        <Sidebar />
+        <Sidebar apiLimitCount={apiLimitCount} />
       </SheetContent>
     </Sheet>
   );
