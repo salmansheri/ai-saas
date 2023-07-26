@@ -27,7 +27,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const VideoGenerationClient = () => {
-  const proModal = useProModal(); 
+  const proModal = useProModal();
   const router = useRouter();
   const [video, setVideo] = useState("");
   const form = useForm<ConversationFormType>({
@@ -53,8 +53,8 @@ const VideoGenerationClient = () => {
 
       form.reset();
     } catch (error) {
-      if(error instanceof AxiosError) {
-        return proModal.onOpen(); 
+      if (error instanceof AxiosError) {
+        return proModal.onOpen();
       }
       return toast({
         title: "something went wrong",

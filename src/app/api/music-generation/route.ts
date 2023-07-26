@@ -25,12 +25,12 @@ export async function POST(request: Request) {
       });
     }
 
-    const freeLimit = await checkApiLimit(); 
+    const freeLimit = await checkApiLimit();
 
-    if(!freeLimit) {
+    if (!freeLimit) {
       return new Response("Free Limit exceeded", {
-        status: 403
-      })
+        status: 403,
+      });
     }
 
     const response = await replication.run(
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       },
     );
 
-    await increaseApiLimit(); 
+    await increaseApiLimit();
 
     return NextResponse.json(response);
   } catch (error) {

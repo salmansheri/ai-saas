@@ -13,12 +13,10 @@ import FreeCounter from "./free-counter";
 const montserrat = Montserrat({ weight: "600", subsets: ["latin"] });
 
 interface SidebarProps {
-  apiLimitCount?: number; 
+  apiLimitCount?: number;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
-  apiLimitCount = 0 
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ apiLimitCount = 0 }) => {
   const pathname = usePathname();
 
   return (
@@ -56,9 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           ))}
         </div>
       </div>
-      <FreeCounter 
-        apiLimitCount={apiLimitCount}
-      />
+      <FreeCounter apiLimitCount={apiLimitCount} />
     </div>
   );
 };

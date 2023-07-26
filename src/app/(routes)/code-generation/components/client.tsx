@@ -32,7 +32,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
 
 const CodeGenerationClient = () => {
-  const proModal = useProModal(); 
+  const proModal = useProModal();
   const router = useRouter();
   const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
   const form = useForm<ConversationFormType>({
@@ -64,8 +64,8 @@ const CodeGenerationClient = () => {
       setMessages((current) => [...current, userMessages, response.data]);
       form.reset();
     } catch (error) {
-      if(error instanceof AxiosError) {
-        return proModal.onOpen(); 
+      if (error instanceof AxiosError) {
+        return proModal.onOpen();
       }
       return toast({
         title: "some",

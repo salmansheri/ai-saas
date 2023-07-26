@@ -43,12 +43,12 @@ export async function POST(request: Request) {
       });
     }
 
-    const freeLimit = await checkApiLimit(); 
+    const freeLimit = await checkApiLimit();
 
-    if(!freeLimit) {
+    if (!freeLimit) {
       return new Response("Free Limit has been exceeded", {
-        status: 403
-      })
+        status: 403,
+      });
     }
 
     const response = await openai.createImage({
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       size: resolution,
     });
 
-    await increaseApiLimit(); 
+    await increaseApiLimit();
 
     return NextResponse.json(response.data.data);
   } catch (error) {

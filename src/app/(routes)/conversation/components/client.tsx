@@ -45,7 +45,7 @@ const ConversationClient = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit: SubmitHandler<ConversationFormType> = async (
-    data: ConversationFormType
+    data: ConversationFormType,
   ) => {
     try {
       setIsLoading(true);
@@ -64,7 +64,7 @@ const ConversationClient = () => {
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
-       return  proModal.onOpen(); // if error status is 403 it will open pro Modal dialog
+        return proModal.onOpen(); // if error status is 403 it will open pro Modal dialog
       }
       return toast({
         title: "something went wrong",
@@ -142,7 +142,7 @@ const ConversationClient = () => {
                     "p-8 w-full flex items-start gap-x-8 rounded-lg",
                     message.role === "user"
                       ? "flex-row-reverse bg-white border border-black/10 "
-                      : "bg-muted flex-row"
+                      : "bg-muted flex-row",
                   )}
                 >
                   {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
