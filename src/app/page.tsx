@@ -1,16 +1,21 @@
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import LandingNavbar from "@/components/LandingNavbar";
+import LandingContent from "@/components/landing-content";
+import LandingHero from "@/components/landing-hero";
+
 
 export default function Home() {
   return (
-    <div>
-      hello world!
-      <div>
-        <Link href="/sign-in" className={cn(buttonVariants())}>
-          Sign in
-        </Link>
+    <main className="h-full bg-[#111827] overflow-auto  w-full">
+
+      <div className="mx-auto  h-full w-full max-w-screen-xl">
+        <div className="h-full">
+          <LandingNavbar />
+          <LandingHero />
+          <LandingContent />
+
+        </div>
+
       </div>
-    </div>
+    </main>
   );
 }
