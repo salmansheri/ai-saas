@@ -28,14 +28,14 @@ const ProModal = () => {
 
   const onSubscribe = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await axios.get("/api/stripe");
       window.location.href = response.data.url;
-      console.log(response.data.url)
+      console.log(response.data.url);
     } catch (error) {
       console.log(error, "Stripe client error");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   };
 

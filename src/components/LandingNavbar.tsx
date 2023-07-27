@@ -30,7 +30,8 @@ const LandingNavbar = () => {
           className={cn(
             buttonVariants({
               variant: "outline",
-            }), "rounded-full"
+            }),
+            "rounded-full",
           )}
           href={isSignedIn ? "/dashboard" : "/sign-up"}
         >

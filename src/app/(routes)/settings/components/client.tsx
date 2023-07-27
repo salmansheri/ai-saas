@@ -25,9 +25,7 @@ const SettingsClient: React.FC<SettingsClientProps> = ({ isPro }) => {
             ? "You are Currently on a Pro plan"
             : "You are currently on a Free Plan"}
         </div>
-        <SubscriptionButton 
-            isPro={isPro}
-        />
+        <SubscriptionButton isPro={isPro} />
       </div>
     </>
   );

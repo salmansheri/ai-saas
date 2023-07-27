@@ -3,13 +3,11 @@ import SettingsClient from "./components/client";
 import { checkSubscription } from "@/lib/stripe/subscription";
 
 export default async function SettingPage() {
-    const isPro = await checkSubscription(); 
+  const isPro = await checkSubscription();
 
-    return(
-        <div>
-            <SettingsClient 
-                isPro={isPro}
-            />
-        </div>
-    )
+  return (
+    <div>
+      <SettingsClient isPro={isPro} />
+    </div>
+  );
 }
